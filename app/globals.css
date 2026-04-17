@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background-color: #0b0b10;
+  color: #f5f5fb;
+  min-height: 100%;
+}
+
+body {
+  font-feature-settings: "ss01", "cv11";
+}
+
+::selection {
+  background: #7c5cff;
+  color: white;
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #7c5cff 0%, #ff5cb0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.panel {
+  background: #141421;
+  border: 1px solid #24243a;
+  border-radius: 16px;
+}

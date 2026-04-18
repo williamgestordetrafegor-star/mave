@@ -21,7 +21,7 @@ export const SceneSchema = z.object({
   scene: z.number().int().positive(),
   visual: z.string(),
   voiceover: z.string(),
-  onScreenText: z.string(),
+  onScreenText: z.string().optional().default(""),
 });
 
 export const ContentSchema = z.object({
@@ -29,7 +29,7 @@ export const ContentSchema = z.object({
   script: z.array(SceneSchema).min(1),
   caption: z.string(),
   cta: z.string(),
-  hashtags: z.array(z.string()).min(5).max(20),
+  hashtags: z.array(z.string()).min(8).max(20),
 });
 
 export type GeneratedContent = z.infer<typeof ContentSchema>;
@@ -70,7 +70,7 @@ export const ContentJsonSchema: Anthropic.Tool.InputSchema = {
               "Texto curto sobreposto na tela (legenda queimada). Pode ser vazio.",
           },
         },
-        required: ["scene", "visual", "voiceover", "onScreenText"],
+        required: ["scene", "visual", "voiceover"],
       },
     },
     caption: {

@@ -37,7 +37,7 @@ export async function POST(request: Request) {
   try {
     const response = await client.messages.create({
       model: MODEL,
-      max_tokens: 2048,
+      max_tokens: 4096,
       system: [
         {
           type: "text",

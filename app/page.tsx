@@ -3,7 +3,10 @@
 import { useState } from "react";
 import ContentForm from "@/components/ContentForm";
 import ContentOutput from "@/components/ContentOutput";
+import { ContentSchema } from "@/lib/schemas";
 import type { GenerateRequest, GeneratedContent } from "@/lib/schemas";
+
+const REQUEST_TIMEOUT_MS = 90_000;
 
 export default function Home() {
   const [content, setContent] = useState<GeneratedContent | null>(null);
@@ -14,21 +17,34 @@ export default function Home() {
     setLoading(true);
     setError(null);
     setContent(null);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
     try {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(req),
+        signal: controller.signal,
       });
       const data = await res.json();
       if (!res.ok) {
         setError(data?.error ?? "Erro ao gerar conteúdo.");
         return;
       }
-      setContent(data.content as GeneratedContent);
+      const validated = ContentSchema.safeParse(data.content);
+      if (!validated.success) {
+        setError("Resposta inválida do servidor.");
+        return;
+      }
+      setContent(validated.data);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Erro de rede.");
+      if (e instanceof DOMException && e.name === "AbortError") {
+        setError("Tempo esgotado. Tente novamente.");
+      } else {
+        setError(e instanceof Error ? e.message : "Erro de rede.");
+      }
     } finally {
+      clearTimeout(timeoutId);
       setLoading(false);
     }
   }

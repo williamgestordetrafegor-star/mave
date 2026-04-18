@@ -9,19 +9,27 @@ type Props = {
   error: string | null;
 };
 
+type CopyState = "idle" | "copied" | "error";
+
 function CopyButton({ text }: { text: string }) {
-  const [copied, setCopied] = useState(false);
+  const [state, setState] = useState<CopyState>("idle");
   return (
     <button
       type="button"
+      aria-label="Copiar texto"
       onClick={async () => {
-        await navigator.clipboard.writeText(text);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 1500);
+        try {
+          await navigator.clipboard.writeText(text);
+          setState("copied");
+        } catch {
+          setState("error");
+        } finally {
+          setTimeout(() => setState("idle"), 1500);
+        }
       }}
       className="text-xs text-muted hover:text-white transition px-2 py-1 rounded border border-border hover:border-muted"
     >
-      {copied ? "copiado" : "copiar"}
+      {state === "copied" ? "copiado" : state === "error" ? "erro" : "copiar"}
     </button>
   );
 }
@@ -150,9 +158,9 @@ export default function ContentOutput({ content, loading, error }: Props) {
 
       <Section title="Hashtags" action={<CopyButton text={hashtagsText} />}>
         <div className="flex flex-wrap gap-2">
-          {content.hashtags.map((h) => (
+          {content.hashtags.map((h, i) => (
             <span
-              key={h}
+              key={`${i}-${h}`}
               className="text-xs bg-bg border border-border rounded-full px-2.5 py-1 text-muted"
             >
               #{h}

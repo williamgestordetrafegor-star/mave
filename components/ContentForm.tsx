@@ -64,9 +64,12 @@ export default function ContentForm({ loading, onSubmit }: Props) {
           </label>
           <select
             value={duration}
-            onChange={(e) =>
-              setDuration(Number(e.target.value) as GenerateRequest["duration"])
-            }
+            onChange={(e) => {
+              const parsed = Number(e.target.value);
+              const next: GenerateRequest["duration"] =
+                parsed === 15 || parsed === 30 || parsed === 60 ? parsed : 30;
+              setDuration(next);
+            }}
             className="w-full bg-bg border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent/60"
           >
             <option value={15}>15 segundos</option>
